@@ -1,0 +1,8 @@
+html,body,#App, #App>div {
+    font-size: 100%;
+    background-color: #1DB954;
+    position: relative;
+    margin:0;
+    padding:0;
+    height: 100vh;
+}

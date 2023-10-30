@@ -1,0 +1,86 @@
+@import "./theme.scss";
+
+.component {
+  //font-size: 16px;
+  text-align: center;
+  width: 100%;
+  position: relative;
+  align-content: center;
+  justify-content: center;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  background-color: $dark-gray;
+  padding: 0.2rem;
+  border-radius: 0.5rem;
+  box-sizing: border-box;
+  max-height: 35%;
+  overflow: hidden;
+  @media screen and (max-height: 150px) {
+    display: none; // Hide the notes when the window height is less than 200px
+  }
+}
+
+.line1 {
+  box-sizing: border-box;
+  flex: 1;
+  flex-direction: row;
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  height: auto;
+  position: relative;
+  padding: 1rem 1rem 0.3rem 1rem ;
+  margin-top: 2rem;
+}
+
+.line2{
+  box-sizing: border-box;
+  flex: 1;
+  position: relative;
+  text-align: center;
+  font-size: 0.75rem;
+  color: $light-gray;
+  margin-top: -0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.line3 {
+  box-sizing: border-box;
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  //margin-top: 0.05rem;
+  padding-right: 2rem;
+  padding-bottom: 1rem;
+  //background-color: #00D4D5;
+  margin-bottom: 1.4rem;
+}
+
+.name {
+  text-align: center;
+  font-family: Arial, sans-serif;
+  font-size: 1.5rem;
+  line-height: normal;
+  width: 100%;
+  height: auto; /* Auto-adjust height based on content */
+  overflow: auto; /* Hide vertical scrollbar if content overflows */
+}
+
+.phone_num {
+
+}
+
+.icon {
+  max-height: 1.5rem;
+  padding: 0.5rem 0.5rem 0.5rem 0.5rem;
+}
+
+.activity {
+  text-align: center;
+}

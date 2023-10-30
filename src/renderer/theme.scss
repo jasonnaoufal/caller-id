@@ -1,0 +1,91 @@
+// Colors
+$green: #1DB954;
+$black: #000000;
+$white: #FFFFFF;
+$gray: #535353;
+$light-gray: #B3B3B3;
+$dark-gray: #121212;
+$red: #E74430;
+$border-color: #333;
+
+// Dark Theme Colors
+$dark-background: $black;
+$dark-text: $white;
+$dark-text-secondary: $light-gray;
+$dark-button-bg: $green;
+$dark-button-text: $white;
+
+// Light Theme Colors
+$light-background: $white;
+$light-text: $black;
+$light-button-bg: $green;
+$light-button-text: $white;
+
+// Button Styles
+@mixin button-styles($bg-color, $text-color, $border-color) {
+  background-color: $bg-color;
+  color: $text-color;
+  border: 1px solid $border-color; /* Add border for Windows 11 style */
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+
+  &:hover {
+    background-color: lighten($bg-color, 10%);
+  }
+
+  &:active {
+    background-color: darken($bg-color, 10%); /* Apply a different color for the active (pressed) state */
+    transform: scale(0.98); /* Add a slight scale effect when the button is pressed */
+    box-shadow: none; /* Remove box shadow when pressed */
+  }
+  &:disabled {
+    background-color: #ccc; /* Change the background color for disabled state */
+    color: #888; /* Change the text color for disabled state */
+    cursor: not-allowed; /* Change cursor style to not-allowed for disabled state */
+    /* Add any other custom styles you want for disabled buttons */
+  }
+}
+
+textarea {
+  border-radius: 5px;
+  transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+  //margin-left: 0.2rem;
+  border: none;
+  background-color: transparent;
+  resize: none;
+  outline: none;
+  font-family: Arial, sans-serif;
+  font-size: 1rem;
+  line-height: 1rem;
+  padding: 0.1rem;
+  //margin: 0;
+  width: 100%;
+  height: auto; /* Auto-adjust height based on content */
+  overflow: auto; /* Hide vertical scrollbar if content overflows */
+  white-space: pre-wrap; /* Preserve line breaks and wrap long lines */
+  color: $dark-text;
+
+  &:hover {
+    background-color: lighten($dark-background, 5%);
+    border: 1px solid $border-color;
+  }
+
+  &:focus {
+    background-color: $dark-background; /* Default background color for text areas */
+    border: 1px solid $green;
+  }
+
+}
+
+
+// Apply the default dark theme to the body
+.body {
+  font-family: Arial, sans-serif;
+  color: $dark-text;
+      button {
+        @include button-styles($dark-button-bg, $dark-button-text, $border-color);
+      }
+
+}

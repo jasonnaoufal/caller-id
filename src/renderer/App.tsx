@@ -1,50 +1,96 @@
-import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
-import icon from '../../assets/icon.svg';
-import './App.css';
+import React, {useEffect, useState} from 'react';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+//@ts-ignore
+import styles from "./app.module.scss";
+import Header from "./Header";
+import {Contact} from "../types/Contact";
+import Buttons_Pane from "./Buttons_Pane";
+import Body from "./Body";
+import {PhoneEvent} from "../types/PhoneEvent";
+import StatusIndicator from "./StatusIndicator";
+import {Status} from "../types/Status";
+import CallHistory from "./CallHistory";
 
-function Hello() {
+
+const App: React.FC = () => {
+
+  const defaultContact: Contact = {
+    name: 'Marc Bou Maroun',
+    phone: '71123123',
+    notes: 'Adma Zone Vert Rue 5',
+  };
+  const defaultPhoneEvent = {
+    action: "ringing",
+    prompt: "Ringing..."
+  }
+  const defaultStatus = {
+    isOnline: true
+  }
+
+  const [contact, setContact] = useState<Contact>(defaultContact);
+  const [phoneEvent, setPhoneEvent] = useState<PhoneEvent>(defaultPhoneEvent);
+  const [status, setStatus] = useState<Status>(defaultStatus);
+
+  useEffect(() => {
+
+    window.electron.ipcRenderer.on('events', (data: string) => {
+      switch (JSON.parse(data)) {
+        case 'ring':
+          setPhoneEvent({
+            action: 'ringing',
+            prompt: 'Ringing...',
+          });
+          break;
+        case 'hungup':
+          setPhoneEvent({
+            action: 'hungup',
+            prompt: 'Hung Up',
+          });
+          break;
+        case 'active':
+          setPhoneEvent({
+            action: 'active',
+            prompt: 'Line Active',
+          });
+          break;
+        default:
+          setPhoneEvent(defaultPhoneEvent);
+          break;
+      }
+    });
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    window.electron.ipcRenderer.on('calls', (data: string) => {
+      setContact(JSON.parse(data));
+    });
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    window.electron.ipcRenderer.on('status', (data: string) => {
+      setStatus(JSON.parse(data));
+    });
+  }, []);
+
+  const [isEditing, setIsEditing] = useState(false);
+  const handleEditClick = () => {
+    setIsEditing(!isEditing);
+  };
+
+  const [historyView, setHistoryView] = useState<boolean>(false);
+  const handleHistoryClick = () => {
+    setHistoryView(!historyView);
+  };
+
   return (
-    <div>
-      <div className="Hello">
-        <img width="200" alt="icon" src={icon} />
-      </div>
-      <h1>electron-react-boilerplate</h1>
-      <div className="Hello">
-        <a
-          href="https://electron-react-boilerplate.js.org/"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <button type="button">
-            <span role="img" aria-label="books">
-              📚
-            </span>
-            Read our docs
-          </button>
-        </a>
-        <a
-          href="https://github.com/sponsors/electron-react-boilerplate"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <button type="button">
-            <span role="img" aria-label="folded hands">
-              🙏
-            </span>
-            Donate
-          </button>
-        </a>
-      </div>
+    <div className={styles.component}>
+      {!historyView && <Header contact={contact} isEditing={isEditing} phoneEvent={phoneEvent} />}
+      {historyView && <CallHistory contact={contact}/>}
+      {!historyView && <Body contact={contact} isEditing={isEditing}/>}
+      <Buttons_Pane contact={contact} isEditing={isEditing} onEditClick={handleEditClick} onHistoryClick={handleHistoryClick}/>
+      <div className={styles.status}><StatusIndicator isOnline={status.isOnline}/></div>
     </div>
   );
-}
+};
 
-export default function App() {
-  return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Hello />} />
-      </Routes>
-    </Router>
-  );
-}
+export default App;

@@ -9,27 +9,16 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow, shell, ipcMain } from 'electron';
-import { autoUpdater } from 'electron-updater';
-import log from 'electron-log';
-import MenuBuilder from './menu';
+import { app, BrowserWindow, ipcMain, screen } from 'electron';
 import { resolveHtmlPath } from './util';
+import { setupRabbitMQ } from './utils-mq';
 
-class AppUpdater {
-  constructor() {
-    log.transports.file.level = 'info';
-    autoUpdater.logger = log;
-    autoUpdater.checkForUpdatesAndNotify();
-  }
-}
+const WINDOW_WIDTH_EXPANDED = 350;
+const WINDOW_HEIGHT_EXPANDED = 500;
+const WINDOW_WIDTH_COLLAPSED = 100;
+const WINDOW_HEIGHT_COLLAPSED = 120;
 
 let mainWindow: BrowserWindow | null = null;
-
-ipcMain.on('ipc-example', async (event, arg) => {
-  const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
-  console.log(msgTemplate(arg));
-  event.reply('ipc-example', msgTemplate('pong'));
-});
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
@@ -40,7 +29,7 @@ const isDebug =
   process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true';
 
 if (isDebug) {
-  require('electron-debug')();
+  //require('electron-debug')();
 }
 
 const installExtensions = async () => {
@@ -70,9 +59,16 @@ const createWindow = async () => {
   };
 
   mainWindow = new BrowserWindow({
-    show: false,
-    width: 1024,
-    height: 728,
+    width: WINDOW_WIDTH_EXPANDED, // Adjust the width to your desired toast notification size
+    height: WINDOW_HEIGHT_EXPANDED, // Adjust the height to your desired toast notification size
+    backgroundColor: '#000000',
+    frame: false, // Remove window frame (remove if you want a frame)
+    alwaysOnTop: true, // Make the window always on top (remove if not needed)
+    show: false, // Hide the window initially
+    resizable: false, // Allow resizing by code
+    maximizable: false, // Prevent maximizing
+    minimizable: false, // Prevent minimizing,
+    opacity: 0.85,
     icon: getAssetPath('icon.png'),
     webPreferences: {
       preload: app.isPackaged
@@ -82,6 +78,11 @@ const createWindow = async () => {
   });
 
   mainWindow.loadURL(resolveHtmlPath('index.html'));
+
+  const { width, height } = screen.getPrimaryDisplay().workAreaSize;
+  const x = width - mainWindow.getBounds().width;
+  const y = height - mainWindow.getBounds().height;
+  mainWindow.setPosition(x, y);
 
   mainWindow.on('ready-to-show', () => {
     if (!mainWindow) {
@@ -97,24 +98,42 @@ const createWindow = async () => {
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
-
-  const menuBuilder = new MenuBuilder(mainWindow);
-  menuBuilder.buildMenu();
-
-  // Open urls in the user's browser
-  mainWindow.webContents.setWindowOpenHandler((edata) => {
-    shell.openExternal(edata.url);
-    return { action: 'deny' };
-  });
-
-  // Remove this if your app does not use auto updates
-  // eslint-disable-next-line
-  new AppUpdater();
 };
+
+function toggleAppVisibility(keepExpanded: boolean) {
+  if (mainWindow) {
+
+    mainWindow.setResizable(true);
+    const { width: currentWidth, height: currentHeight } =
+      mainWindow.getBounds();
+    const { width: displayWidth, height: displayHeight } =
+      screen.getPrimaryDisplay().workAreaSize;
+
+    if (
+      currentWidth === WINDOW_WIDTH_COLLAPSED &&
+      currentHeight === WINDOW_HEIGHT_COLLAPSED &&
+      !keepExpanded
+    ) {
+      mainWindow.setSize(WINDOW_WIDTH_EXPANDED, WINDOW_HEIGHT_EXPANDED);
+      mainWindow.setOpacity(0.85);
+    } else {
+      mainWindow.setSize(WINDOW_WIDTH_COLLAPSED, WINDOW_HEIGHT_COLLAPSED);
+      mainWindow.setOpacity(0.65);
+    }
+
+    mainWindow.setPosition(displayWidth - mainWindow.getBounds().width, displayHeight - mainWindow.getBounds().height);
+    mainWindow.setResizable(false);
+  }
+}
 
 /**
  * Add event listeners...
  */
+
+ipcMain.on("minimize", () => {
+    toggleAppVisibility(false);
+  }
+);
 
 app.on('window-all-closed', () => {
   // Respect the OSX convention of having the application in memory even
@@ -129,9 +148,12 @@ app
   .then(() => {
     createWindow();
     app.on('activate', () => {
-      // On macOS it's common to re-create a window in the app when the
+      // On macOS, it's common to re-create a window in the app when the
       // dock icon is clicked and there are no other windows open.
       if (mainWindow === null) createWindow();
     });
   })
   .catch(console.log);
+
+// @ts-ignore
+setupRabbitMQ(mainWindow);

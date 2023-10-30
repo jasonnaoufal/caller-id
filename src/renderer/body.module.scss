@@ -1,0 +1,48 @@
+@import "./theme.scss";
+
+.component {
+  text-align: center;
+  display: flex;
+  width: 100%;
+  position: relative;
+  justify-content: start;
+  flex: 2;
+  flex-direction: column;
+  background-color: $dark-gray;
+  margin-top: 0.5rem;
+  border-radius: 0.5rem;
+  max-height: 45%;
+  //box-sizing: border-box;
+  @media screen and (max-height: 150px) {
+    display: none;
+  }
+}
+
+.notes {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  justify-content: start;
+  padding: 1rem 1rem 0.5rem 1rem;
+  //background-color: #E74430;
+}
+
+.notes_title {
+  font-size: 1.2rem;
+  margin-bottom: 0.25rem;
+  padding-left: 0.5rem;
+  //margin-left: 0.25rem;
+}
+
+.notes_content {
+  font-family: Arial, sans-serif;
+  font-size: 1rem;
+  line-height: 1.5;
+  padding: 0 0 0.5rem 0.5rem;
+  width: 100%;
+  height: 100%; /* Auto-adjust height based on content */
+  overflow: auto; /* Hide vertical scrollbar if content overflows */
+  color: $light-gray;
+}

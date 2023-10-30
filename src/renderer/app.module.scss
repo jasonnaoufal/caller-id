@@ -1,0 +1,27 @@
+@import "./theme.scss";
+
+.component {
+  @extend .body;
+  background-color: $dark-background;
+  height: 100vh;
+  width: 100vw;
+  //max-width: 100%;
+  //display: grid;
+  //grid-template-rows: minmax(0, 100%) auto auto; /* Create three rows, the first one can grow as needed */
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  justify-content: center;
+  position: relative;
+  overflow: auto;
+  box-sizing: border-box;
+  padding: 1rem 1rem 0.5rem 1rem;
+}
+
+.status {
+  padding-top: 0.5rem;
+  padding-right: 0.5rem;
+  position: relative;
+  align-self: end;
+}
+
